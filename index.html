@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GymBuddy HQ - Plan workouts, calculate calories, and build your weekly split with our beginner-friendly gym assistant.">
+    <title>GymBuddy HQ - Your Personal Gym Coach</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- ==================== NAV ==================== -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <h1>💪 GymBuddy HQ</h1>
+            </div>
+            <ul class="navbar-links">
+                <li><a href="#workout-builder" class="nav-link">Workout Builder</a></li>
+                <li><a href="#calorie-calculator" class="nav-link">Calorie Calculator</a></li>
+                <li><a href="#weekly-split" class="nav-link">Weekly Split</a></li>
+                <li><a href="#diet-goals" class="nav-link">Diet Goals</a></li>
+                <li><a href="#faq" class="nav-link">FAQ</a></li>
+                <li><button class="btn-coach" id="coach-btn" aria-label="Open chat with Coach">Ask the Coach</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ==================== COACH CHAT DRAWER ==================== -->
+    <div class="coach-drawer" id="coach-drawer" role="dialog" aria-labelledby="coach-title" aria-hidden="true">
+        <div class="coach-content">
+            <div class="coach-header">
+                <h2 id="coach-title">Ask the Coach 🏋️</h2>
+                <button class="btn-close" id="coach-close" aria-label="Close chat">✕</button>
+            </div>
+            <div class="coach-messages" id="coach-messages" role="log" aria-live="polite"></div>
+            <div class="coach-input-area">
+                <input 
+                    type="text" 
+                    id="coach-input" 
+                    placeholder="Ask me about workouts, nutrition, or splits..." 
+                    aria-label="Message to coach"
+                />
+                <button class="btn-send" id="coach-send" aria-label="Send message">Send</button>
+            </div>
+            <p class="coach-note">
+                💡 <strong>Note:</strong> Webhook integration point for external chatbot (n8n/Flowise) — 
+                see <code>js/coach.js</code> for connection details.
+            </p>
+        </div>
+    </div>
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero" aria-label="Hero section">
+        <div class="hero-content">
+            <h2 class="hero-headline">Train Smart, Stay Consistent</h2>
+            <p class="hero-subtitle">Plan your workouts, calculate calories, and build your perfect weekly split — all in one beginner-friendly place.</p>
+            
+            <div class="hero-highlights">
+                <div class="highlight-card">
+                    <span class="highlight-icon">📋</span>
+                    <h3>Muscle-Group Plans</h3>
+                    <p>Guided workouts tailored to your experience level</p>
+                </div>
+                <div class="highlight-card">
+                    <span class="highlight-icon">🔢</span>
+                    <h3>Calorie Estimate</h3>
+                    <p>Calculate your TDEE and set safe nutrition targets</p>
+                </div>
+                <div class="highlight-card">
+                    <span class="highlight-icon">📅</span>
+                    <h3>Weekly Split</h3>
+                    <p>Auto-generate balanced workout schedules</p>
+                </div>
+            </div>
+
+            <div class="hero-cta">
+                <a href="#workout-builder" class="btn btn-primary">Build My Workout</a>
+                <a href="#calorie-calculator" class="btn btn-secondary">Calculate Calories</a>
+            </div>
+
+            <!-- Optional SVG placeholder -->
+            <svg class="hero-illustration" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect width="300" height="200" fill="#f0f5fa" rx="12"/>
+                <circle cx="100" cy="80" r="30" fill="#4a9eff" opacity="0.3"/>
+                <circle cx="200" cy="120" r="25" fill="#10b981" opacity="0.3"/>
+                <path d="M 80 150 Q 150 100 220 150" stroke="#ff7a5c" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <text x="150" y="190" text-anchor="middle" font-size="14" fill="#666">
+                    Your fitness journey starts here
+                </text>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ==================== WORKOUT BUILDER ==================== -->
+    <section id="workout-builder" class="section" aria-labelledby="workout-title">
+        <div class="container">
+            <h2 id="workout-title">🏋️ Workout Builder</h2>
+            <p class="section-desc">Generate a customized workout based on your goal and experience.</p>
+
+            <div class="content-grid">
+                <!-- Input Form -->
+                <div class="card form-card">
+                    <h3>Build Your Workout</h3>
+                    <form id="workout-form" class="form">
+                        <div class="form-group">
+                            <label for="workout-goal">Training Goal</label>
+                            <select id="workout-goal" required>
+                                <option value="">-- Select Goal --</option>
+                                <option value="strength">Strength</option>
+                                <option value="muscle">Muscle Gain</option>
+                                <option value="fat-loss">Fat Loss</option>
+                                <option value="fitness">General Fitness</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="workout-muscle">Focus Muscle Group</label>
+                            <select id="workout-muscle" required>
+                                <option value="">-- Select Muscle Group --</option>
+                                <option value="chest">Chest</option>
+                                <option value="back">Back</option>
+                                <option value="legs">Legs</option>
+                                <option value="shoulders">Shoulders</option>
+                                <option value="arms">Arms</option>
+                                <option value="core">Core</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="workout-level">Experience Level</label>
+                            <select id="workout-level" required>
+                                <option value="">-- Select Level --</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="workout-equipment">Equipment Available</label>
+                            <select id="workout-equipment" required>
+                                <option value="">-- Select Equipment --</option>
+                                <option value="full-gym">Full Gym</option>
+                                <option value="dumbbells">Dumbbells Only</option>
+                                <option value="bodyweight">Bodyweight Only</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Generate Workout</button>
+                    </form>
+                </div>
+
+                <!-- Results Output -->
+                <div id="workout-result" class="card result-card" style="display: none;">
+                    <div class="result-header">
+                        <h3 id="result-title">Your Workout</h3>
+                        <div class="result-actions">
+                            <button class="btn btn-sm btn-outline" id="workout-copy" aria-label="Copy workout">📋 Copy</button>
+                            <button class="btn btn-sm btn-outline" id="workout-save" aria-label="Save workout">💾 Save</button>
+                            <button class="btn btn-sm btn-outline" id="workout-regen" aria-label="Regenerate workout">🔄 Regenerate</button>
+                        </div>
+                    </div>
+
+                    <div id="workout-content" class="result-content">
+                        <!-- Dynamic content inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Saved Workouts List -->
+            <div id="saved-workouts-container" style="display: none; margin-top: 2rem;">
+                <h3>💾 Saved Workouts</h3>
+                <div id="saved-workouts-list" class="workouts-grid">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CALORIE CALCULATOR ==================== -->
+    <section id="calorie-calculator" class="section" aria-labelledby="calorie-title">
+        <div class="container">
+            <h2 id="calorie-title">🔢 Calorie Calculator</h2>
+            <p class="section-desc">Calculate your daily calorie needs (TDEE) using the Mifflin-St Jeor equation.</p>
+
+            <div class="content-grid">
+                <!-- Input Form -->
+                <div class="card form-card">
+                    <h3>Your Stats</h3>
+                    <form id="calorie-form" class="form">
+                        <div class="unit-toggle">
+                            <label>
+                                <input type="radio" name="unit-system" value="metric" checked> Metric (cm, kg)
+                            </label>
+                            <label>
+                                <input type="radio" name="unit-system" value="imperial"> Imperial (in, lb)
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cal-sex">Sex (optional)</label>
+                            <select id="cal-sex">
+                                <option value="">-- Not specified --</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cal-age">Age</label>
+                            <input type="number" id="cal-age" min="10" max="120" placeholder="e.g., 25" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cal-height">Height (<span class="unit-text">cm</span>)</label>
+                            <input type="number" id="cal-height" min="100" max="300" placeholder="e.g., 180" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cal-weight">Weight (<span class="unit-text">kg</span>)</label>
+                            <input type="number" id="cal-weight" min="30" max="300" step="0.1" placeholder="e.g., 75" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cal-activity">Activity Level</label>
+                            <select id="cal-activity" required>
+                                <option value="">-- Select Activity --</option>
+                                <option value="sedentary">Sedentary (little/no exercise)</option>
+                                <option value="light">Light (1–3 days/week)</option>
+                                <option value="moderate">Moderate (3–5 days/week)</option>
+                                <option value="active">Active (6–7 days/week)</option>
+                                <option value="very-active">Very Active (intense training)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cal-goal">Goal</label>
+                            <select id="cal-goal" required>
+                                <option value="">-- Select Goal --</option>
+                                <option value="maintain">Maintain Weight</option>
+                                <option value="lose">Lose Fat (small deficit)</option>
+                                <option value="gain">Gain Weight (small surplus)</option>
+                                <option value="muscle">Build Muscle (small surplus)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Calculate</button>
+                    </form>
+                </div>
+
+                <!-- Results Output -->
+                <div id="calorie-result" class="card result-card" style="display: none;">
+                    <h3>Your Nutrition Plan</h3>
+                    <div id="calorie-content" class="result-content">
+                        <!-- Dynamic content inserted here -->
+                    </div>
+                    <button class="btn btn-sm btn-outline" id="cal-save" style="margin-top: 1rem;">💾 Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== WEEKLY SPLIT ==================== -->
+    <section id="weekly-split" class="section" aria-labelledby="split-title">
+        <div class="container">
+            <h2 id="split-title">📅 Weekly Split Planner</h2>
+            <p class="section-desc">Generate a balanced weekly workout schedule based on your preferences.</p>
+
+            <div class="content-grid">
+                <!-- Input Form -->
+                <div class="card form-card">
+                    <h3>Plan Your Week</h3>
+                    <form id="split-form" class="form">
+                        <div class="form-group">
+                            <label for="split-days">Days Per Week</label>
+                            <input type="range" id="split-days" min="2" max="6" value="4" list="days-list" required>
+                            <datalist id="days-list">
+                                <option value="2"></option>
+                                <option value="3"></option>
+                                <option value="4"></option>
+                                <option value="5"></option>
+                                <option value="6"></option>
+                            </datalist>
+                            <span id="split-days-display">4 days</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="split-goal">Training Goal</label>
+                            <select id="split-goal" required>
+                                <option value="">-- Select Goal --</option>
+                                <option value="strength">Strength</option>
+                                <option value="muscle">Muscle Gain</option>
+                                <option value="fat-loss">Fat Loss</option>
+                                <option value="fitness">General Fitness</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="split-level">Experience Level</label>
+                            <select id="split-level" required>
+                                <option value="">-- Select Level --</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="split-type">Split Type</label>
+                            <select id="split-type" required>
+                                <option value="">-- Select Type --</option>
+                                <option value="full-body">Full Body</option>
+                                <option value="upper-lower">Upper/Lower</option>
+                                <option value="ppl">Push/Pull/Legs</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Generate Split</button>
+                    </form>
+                </div>
+
+                <!-- Results Output -->
+                <div id="split-result" class="card result-card" style="display: none;">
+                    <div class="result-header">
+                        <h3>Your Weekly Schedule</h3>
+                        <div class="result-actions">
+                            <button class="btn btn-sm btn-outline" id="split-export" aria-label="Export split">📝 Export</button>
+                            <button class="btn btn-sm btn-outline" id="split-save" aria-label="Save split">💾 Save</button>
+                            <button class="btn btn-sm btn-outline" id="split-regen" aria-label="Regenerate split">🔄 Regenerate</button>
+                        </div>
+                    </div>
+                    <div id="split-calendar" class="split-calendar">
+                        <!-- Dynamic calendar inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== DIET GOALS ==================== -->
+    <section id="diet-goals" class="section" aria-labelledby="diet-title">
+        <div class="container">
+            <h2 id="diet-title">🍽️ Diet Goals</h2>
+            <p class="section-desc">Get practical nutrition tips tailored to your fitness goal.</p>
+
+            <div class="diet-selector">
+                <button class="diet-btn" data-goal="gain" aria-pressed="false">📈 Gain Weight</button>
+                <button class="diet-btn" data-goal="muscle" aria-pressed="false">💪 Build Muscle</button>
+                <button class="diet-btn" data-goal="lose" aria-pressed="false">⚡ Lose Fat</button>
+            </div>
+
+            <div id="diet-result" class="card" style="display: none;">
+                <h3 id="diet-goal-title">Nutrition Guide</h3>
+                <div id="diet-content" class="diet-content">
+                    <!-- Dynamic content inserted here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FAQ ==================== -->
+    <section id="faq" class="section" aria-labelledby="faq-title">
+        <div class="container">
+            <h2 id="faq-title">❓ Frequently Asked Questions</h2>
+            <p class="section-desc">Find answers to common workout, diet, and recovery questions.</p>
+
+            <div class="faq-accordion" role="region" aria-label="Frequently asked questions">
+                <!-- FAQ items will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>GymBuddy HQ</h3>
+                    <p>Your personal gym coach for workouts, nutrition, and training splits.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <ul class="social-links">
+                        <li><a href="#" aria-label="Follow on Twitter">Twitter</a></li>
+                        <li><a href="#" aria-label="Follow on Instagram">Instagram</a></li>
+                        <li><a href="#" aria-label="Subscribe on YouTube">YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-disclaimer">
+                <p>
+                    ⚠️ <strong>Disclaimer:</strong> GymBuddy HQ provides general fitness and nutrition information for educational purposes only. 
+                    Always consult with a qualified healthcare professional, registered dietitian, or certified fitness trainer before starting 
+                    a new exercise program or making significant dietary changes, especially if you have pre-existing health conditions.
+                </p>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 GymBuddy HQ. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== SCRIPTS ==================== -->
+    <script defer src="js/app.js"></script>
+    <script defer src="js/coach.js"></script>
+</body>
+</html>
